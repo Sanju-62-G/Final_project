@@ -29,6 +29,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'services/auth_service.dart';
 import 'services/notification_service.dart';
 
+const String webClientId = '58701316295-8urur3knf2soebbhurg3klp6b23foeba.apps.googleusercontent.com';
+const String iosClientId = '58701316295-377olqq43s5hqnh9bds6m9h487gc8506.apps.googleusercontent.com';
+const String androidClientId = '58701316295-ovr6cfqh5p5odnvj3f551o3h57d466g6.apps.googleusercontent.com';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

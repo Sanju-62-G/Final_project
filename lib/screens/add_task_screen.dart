@@ -11,8 +11,6 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
-  String _selectedPriority = 'Medium';
-  String _selectedCategory = 'Academic';
   final TextEditingController _taskController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
 

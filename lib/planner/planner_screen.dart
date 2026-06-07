@@ -181,60 +181,65 @@ class _PlannerScreenState extends State<PlannerScreen> {
   void _showCourseDetails(Map<String, dynamic> course) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: const Color(0xFFF6F1E9),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(32.w))),
       builder: (context) => Container(
-        padding: EdgeInsets.all(32.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(course['name'], style: GoogleFonts.poppins(fontSize: 20.sp, fontWeight: FontWeight.bold)),
-                    Text(course['course_code'], style: GoogleFonts.poppins(fontSize: 14.sp, color: Colors.grey)),
-                  ],
-                ),
-                IconButton(
-                  onPressed: () => _handleDeleteCourse(course['id'].toString()),
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                ),
-              ],
-            ),
-            SizedBox(height: 24.h),
-            _buildDetailRow(Icons.star_outline, 'Credits', '${course['credit_hours']}'),
-            _buildDetailRow(Icons.calendar_today_outlined, 'Semester', course['semester']),
-            if (course['teacher_name'] != null)
-              _buildDetailRow(Icons.person_outline, 'Teacher', course['teacher_name']),
-            SizedBox(height: 24.h),
-            CustomButton(
-              content: 'View Topic Graph',
-              width: double.infinity,
-              variant: 'outline',
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DAGGraphScreen(
-                      courseId: course['id'].toString(),
-                      courseName: course['name'],
+        padding: EdgeInsets.fromLTRB(32.w, 32.h, 32.w, MediaQuery.of(context).padding.bottom + 16.h),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(course['name'], style: GoogleFonts.poppins(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                        Text(course['course_code'], style: GoogleFonts.poppins(fontSize: 14.sp, color: Colors.grey)),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
-            SizedBox(height: 12.h),
-            CustomButton(
-              content: 'Close',
-              width: double.infinity,
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
+                  IconButton(
+                    onPressed: () => _handleDeleteCourse(course['id'].toString()),
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  ),
+                ],
+              ),
+              SizedBox(height: 24.h),
+              _buildDetailRow(Icons.star_outline, 'Credits', '${course['credit_hours']}'),
+              _buildDetailRow(Icons.calendar_today_outlined, 'Semester', course['semester']),
+              if (course['teacher_name'] != null)
+                _buildDetailRow(Icons.person_outline, 'Teacher', course['teacher_name']),
+              SizedBox(height: 24.h),
+              CustomButton(
+                content: 'View Topic Graph',
+                width: double.infinity,
+                variant: 'outline',
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DAGGraphScreen(
+                        courseId: course['id'].toString(),
+                        courseName: course['name'],
+                      ),
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 12.h),
+              CustomButton(
+                content: 'Close',
+                width: double.infinity,
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
         ),
       ),
     );

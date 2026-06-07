@@ -3,6 +3,7 @@ import 'supabase_client.dart';
 
 class CareerTemplateService {
   static Future<void> loadCareerTemplate(String careerGoal) async {
+    debugPrint('Loading template for: $careerGoal');
     final userId = SupabaseClientService.currentUserId;
     if (userId == null) return;
 

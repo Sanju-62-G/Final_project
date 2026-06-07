@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'supabase_client.dart';
+import '../utils/constants.dart';
 
 class AuthService {
   AuthService._();
@@ -17,6 +19,56 @@ class AuthService {
       email: email,
       password: password,
     );
+  }
+
+  // Google Sign In
+  Future<AuthResponse?> signInWithGoogle() async {
+    try {
+      // For Google Sign In on Android, you need to provide the webClientId
+      // for the ID token to be generated.
+      const webClientId = AppConstants.webClientId;
+      const iosClientId = AppConstants.iosClientId;
+
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        clientId: iosClientId,
+        serverClientId: webClientId,
+      );
+      
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return null;
+
+      final googleAuth = await googleUser.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw Exception('No ID Token found.');
+      }
+
+      final response = await SupabaseClientService.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+
+      // If user is new, create a record in 'users' table
+      if (response.user != null) {
+        final profile = await getUserProfile();
+        if (profile == null) {
+          await SupabaseClientService.from('users').upsert({
+            'id': response.user!.id,
+            'full_name': response.user!.userMetadata?['full_name'] ?? googleUser.displayName ?? 'Google User',
+            'email': response.user!.email,
+            'avatar_url': response.user!.userMetadata?['avatar_url'] ?? googleUser.photoUrl,
+          });
+        }
+      }
+
+      return response;
+    } catch (e) {
+      debugPrint('Google Sign In Error: $e');
+      rethrow;
+    }
   }
 
   Future<AuthResponse> signUp({

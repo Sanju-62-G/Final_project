@@ -4,7 +4,7 @@ import '../utils/responsive.dart';
 import '../Components/custom_button.dart';
 import '../models/goal_setup_data.dart';
 import '../services/goal_service.dart';
-import '../services/career_template_service.dart';
+import '../services/course_service.dart';
 
 class AcademicSetupScreen extends StatefulWidget {
   final GoalSetupData? goalData;
@@ -113,6 +113,17 @@ class _AcademicSetupScreenState extends State<AcademicSetupScreen> {
                     _data.cgpaPriorityRatio = 0.5;
                   }
 
+                  // Show loading dialog
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFFF9A00),
+                      ),
+                    ),
+                  );
+
                   try {
                     await GoalService.saveGoal(
                       selectedGoal: _data.selectedGoal ?? 'Improve my CGPA',
@@ -124,16 +135,23 @@ class _AcademicSetupScreenState extends State<AcademicSetupScreen> {
                     );
 
                     // Career goal থাকলে template load করো
-                    if (_data.careerGoal != null) {
-                      await CareerTemplateService.loadCareerTemplate(_data.careerGoal!);
+                    if (_data.careerGoal != null && _data.careerGoal!.isNotEmpty) {
+                      debugPrint('=== LOADING TEMPLATE: ${_data.careerGoal} ===');
+                      
+                      // CourseService.setupCareerPresets use করো
+                      await CourseService.setupCareerPresets(_data.careerGoal!);
+                      
+                      debugPrint('=== TEMPLATE LOADED ===');
                     }
                     
                     if (!context.mounted) return;
                     Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
                   } catch (e) {
+                    debugPrint('Error: $e');
                     if (!context.mounted) return;
+                    Navigator.pop(context); // Close loading dialog
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error saving goals: $e')),
+                      SnackBar(content: Text('Error: $e')),
                     );
                   }
                 },

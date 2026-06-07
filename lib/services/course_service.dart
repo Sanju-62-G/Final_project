@@ -101,13 +101,21 @@ class CourseService {
     Map<String, String> templateTopicToUserTopic = {};
 
     for (var preset in presetCourses) {
+      // Already আছে কিনা check করো
+      final existing = await SupabaseClientService.from('courses')
+          .select()
+          .eq('user_id', userId)
+          .eq('course_code', preset['course_code']);
+
+      if ((existing as List).isNotEmpty) continue;
+
       // 2. Insert course for user
       final newCourse = await SupabaseClientService.from('courses').insert({
         'user_id': userId,
         'name': preset['course_name'],
         'course_code': preset['course_code'],
         'credit_hours': preset['credit_hours'],
-        'semester': 'Semester 1', 
+        'semester': 'Semester 1',
         'is_career_relevant': true,
       }).select().single();
 

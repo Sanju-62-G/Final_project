@@ -10,7 +10,6 @@ import '../services/deadline_service.dart';
 import '../services/goal_service.dart';
 import '../services/course_service.dart';
 import '../services/topic_service.dart';
-import '../services/scheduler_service.dart';
 import '../Goal_Engine/goal_setup.dart';
 import 'add_deadline_screen.dart';
 import 'edit_deadline_screen.dart';

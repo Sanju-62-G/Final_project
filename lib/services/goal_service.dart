@@ -1,4 +1,5 @@
 import 'supabase_client.dart';
+import 'career_template_service.dart';
 
 class GoalService {
   // Goal save করো
@@ -21,6 +22,31 @@ class GoalService {
       'cgpa_priority_ratio': cgpaPriorityRatio ?? 0.5,
       'semester': semester,
     }).eq('id', userId);
+  }
+
+  // Goal save and Load Career Template
+  static Future<void> saveGoalWithTemplate({
+    required String selectedGoal,
+    String? careerGoal,
+    double? currentCgpa,
+    double? targetCgpa,
+    double? cgpaPriorityRatio,
+    required String semester,
+  }) async {
+    // 1. First, save the goal to user profile
+    await saveGoal(
+      selectedGoal: selectedGoal,
+      careerGoal: careerGoal,
+      currentCgpa: currentCgpa,
+      targetCgpa: targetCgpa,
+      cgpaPriorityRatio: cgpaPriorityRatio,
+      semester: semester,
+    );
+
+    // 2. If a career goal is selected, load the corresponding academic template
+    if (careerGoal != null && careerGoal.isNotEmpty) {
+      await CareerTemplateService.loadCareerTemplate(careerGoal);
+    }
   }
 
   // User goal data fetch করো

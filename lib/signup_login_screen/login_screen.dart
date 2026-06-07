@@ -161,7 +161,30 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 20.h,
                       errorBuilder: (context, error, stackTrace) => Icon(Icons.g_mobiledata, color: const Color(0xFF4285F4), size: 24.sp),
                     ),
-                    onPressed: () {},
+                    onPressed: () async {
+                      setState(() => _isLoading = true);
+                      try {
+                        final response = await AuthService.instance.signInWithGoogle();
+                        if (response != null && response.user != null) {
+                          if (!mounted) return;
+                          
+                          // Check if it's a new user by checking profile
+                          final profile = await AuthService.instance.getUserProfile();
+                          if (!context.mounted) return;
+
+                          if (profile == null || profile['selected_goal'] == null) {
+                            Navigator.pushNamedAndRemoveUntil(context, '/goal_setup', (route) => false);
+                          } else {
+                            Navigator.pushReplacementNamed(context, '/dashboard');
+                          }
+                        }
+                      } catch (e) {
+                        debugPrint('Google Sign In Error: $e');
+                        _showError('Google Sign In failed. Please try again.');
+                      } finally {
+                        if (mounted) setState(() => _isLoading = false);
+                      }
+                    },
                   ),
                   SizedBox(height: 12.h),
                   SocialButton(

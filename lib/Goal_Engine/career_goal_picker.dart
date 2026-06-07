@@ -29,36 +29,42 @@ class _CareerGoalPickerScreenState extends State<CareerGoalPickerScreen> {
   final List<Map<String, dynamic>> _roles = [
     {
       'title': 'Flutter Developer',
+      'key': 'flutter_developer',
       'icon': Icons.phone_android_outlined,
       'color': const Color(0xFF0284C7),
       'skills': ['Dart', 'Flutter', 'Firebase'],
     },
     {
       'title': 'Web Developer',
+      'key': 'web_developer',
       'icon': Icons.language_outlined,
       'color': const Color(0xFF7C3AED),
       'skills': ['React', 'Next.js', 'Tailwind'],
     },
     {
       'title': 'Software Engineer',
+      'key': 'software_engineer',
       'icon': Icons.code_outlined,
       'color': const Color(0xFF059669),
       'skills': ['Java', 'C++', 'Algorithms'],
     },
     {
       'title': 'Data Scientist',
+      'key': 'data_scientist',
       'icon': Icons.bar_chart_outlined,
       'color': const Color(0xFFDC2626),
       'skills': ['Python', 'SQL', 'Statistics'],
     },
     {
       'title': 'AI/ML Engineer',
+      'key': 'ai_ml_engineer',
       'icon': Icons.psychology_outlined,
       'color': const Color(0xFFEA580C),
       'skills': ['PyTorch', 'Linear Algebra'],
     },
     {
       'title': 'Backend Developer',
+      'key': 'backend_developer',
       'icon': Icons.storage_outlined,
       'color': const Color(0xFF4F46E5),
       'skills': ['Node.js', 'Go', 'Docker'],
@@ -200,8 +206,8 @@ class _CareerGoalPickerScreenState extends State<CareerGoalPickerScreen> {
             width: double.infinity,
             onPressed: _selectedRoleIndex != -1
                 ? () async {
-                    final selectedRole = _roles[_selectedRoleIndex]['title'];
-                    _data.careerGoal = selectedRole;
+                    final selectedRoleKey = _roles[_selectedRoleIndex]['key'] as String;
+                    _data.careerGoal = selectedRoleKey;
 
                     if (_data.selectedGoal == 'Build my career path') {
                       await _saveAndFinish();
@@ -224,6 +230,17 @@ class _CareerGoalPickerScreenState extends State<CareerGoalPickerScreen> {
   }
 
   Future<void> _saveAndFinish() async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(
+          color: Color(0xFFFF9A00),
+        ),
+      ),
+    );
+
     try {
       await GoalService.saveGoal(
         selectedGoal: _data.selectedGoal ?? 'Build my career path',
@@ -231,7 +248,7 @@ class _CareerGoalPickerScreenState extends State<CareerGoalPickerScreen> {
         semester: _data.semester ?? 'N/A',
       );
 
-      // যদি ক্যারিয়ার গোল থাকে, তবে প্রেসেট কোর্স লোড করো
+      // Career template load করো
       if (_data.careerGoal != null) {
         await CourseService.setupCareerPresets(_data.careerGoal!);
       }
@@ -240,6 +257,7 @@ class _CareerGoalPickerScreenState extends State<CareerGoalPickerScreen> {
       Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
     } catch (e) {
       if (!mounted) return;
+      Navigator.pop(context); // Close loading dialog
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error saving goals: $e')),
       );
